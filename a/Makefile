@@ -1,26 +1,15 @@
-# Short instruction for building kernel module
+reader: reader.o
+	gcc -o reader reader.o
 
-ifneq ($(KERNELRELEASE),)
-# call from kernel build system
+reader.o: reader.c
+	gcc -Wall -c reader.c
 
-# Add your debugging flag (or not) to CFLAGS
-# debug by default, comment next line if required
-DEBUG = y
-ifeq ($(DEBUG),y)
-  ccflags-y += -DSHOFER_DEBUG
-endif
+writer: writer.o utils.o
+	gcc -o writer writer.o utils.o
 
-obj-m	:= shofer.o
+writer.o: writer.c utils.h
+	gcc -Wall -c writer.c
 
-else
+utils.o: utils.c utils.h
+	gcc -Wall -c utils.c
 
-KERNELDIR ?= /lib/modules/$(shell uname -r)/build
-PWD       := $(shell pwd)
-
-modules:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
-
-endif
-
-clean:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean
